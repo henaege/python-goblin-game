@@ -25,7 +25,7 @@ hero = {
     "x": 50,
     "y": 50,
     "speed": 10,
-    "wins": 0,
+    "kills": 0,
     "health": 60
 }
 
@@ -46,13 +46,19 @@ goblin = {
 monster = {
     'x': 300,
     'y': 50,
-    'speed': 8,
-    'direction':0
+    'speed': 50,
+    'direction': 2
 }
 
-# def random_motion(x, y):
-#     goblin["x"] = rand_x
-#     goblin["y"] = rand_y
+rand_x = randint(0, screen["width"]-50)
+rand_y = randint(0, screen["height"]-200)
+health_boost = {
+    'x': rand_x,
+    'y': rand_y,
+    'speed': 5,
+    'direction': 1
+}
+
 
 screen_size = (screen["height"], screen["width"])
 pygame_screen = pygame.display.set_mode(screen_size)
@@ -64,12 +70,14 @@ hero_image_scaled = pygame.transform.scale(hero_image, (50, 80))
 goblin_image = pygame.image.load('images/beholder.png')
 goblin_image_scaled = pygame.transform.scale(goblin_image, (60, 60))
 monster_image = pygame.image.load('images/dragon.png')
+health_boost_image = pygame.image.load('./images/heart.png')
 
 # ADD MUSIC
-pygame.mixer.music.load('./sounds/music.wav')
+pygame.mixer.music.load('./sounds/culex.wav')
 pygame.mixer.music.play(-1)
-win_sound = pygame.mixer.Sound('./sounds/win.wav')
-lose_sound = pygame.mixer.Sound('./sounds/lose.wav')
+win_sound = pygame.mixer.Sound('./sounds/orc_die.ogg')
+lose_sound = pygame.mixer.Sound('./sounds/hits/6.ogg')
+heal_sound = pygame.mixer.Sound('./sounds/heal.wav')
 
 # ///////////////////// MAIN GAME LOOP ///////////////////
 
@@ -115,7 +123,21 @@ while game_on:
                 keys_down["left"] = False
             if event.key == keys["right"]:
                 keys_down["right"] = False
-        
+
+    # Monster Movement
+    if loop_count % 50 == 0:
+        goblin['direction'] = randint(1,4)
+    
+    if loop_count % 20 == 0:
+        monster['direction'] = randint(1,4)
+    
+
+    if hero['health'] <= 30:
+        pygame_screen.blit(health_boost_image, [health_boost['x'], health_boost['y']])
+        if loop_count % 30 == 0:
+            health_boost['speed'] = 10
+            health_boost['direction'] = randint(1,4)
+    loop_count += 1
 
     if keys_down["up"]:
         if hero["y"] > 20:
@@ -134,14 +156,14 @@ while game_on:
     distance_between = fabs(hero["x"] - goblin["x"]) + fabs(hero["y"] - goblin["y"])
     distance_from_monster = fabs(hero["x"] - monster['x']) + fabs(hero["y"] - monster['y'])
     distance_from_wall = fabs(hero["x"] - screen["width"]) + fabs(hero["y"] - screen["height"])
+    distance_from_health = fabs(hero['x'] - health_boost['x']) + fabs(hero['y'] - health_boost['y'])
     if distance_between < 50:
         # generate a random x greater than 0 and less than screen width
         rand_x = randint(0, screen["width"]-50)
-        rand_y = randint(0, screen["height"]-100)
+        rand_y = randint(0, screen["height"]-200)
         goblin["x"] = rand_x
         goblin["y"] = rand_y
-
-        hero["wins"] += 1
+        hero["kills"] += 1
         win_sound.play()
     elif loop_count % 10 == 0:
         if goblin['direction'] == 1:
@@ -156,8 +178,46 @@ while game_on:
         elif goblin['direction'] == 4:
             if goblin["x"] < screen["width"] - 50:
                 goblin["x"] += goblin["speed"]
-    if distance_from_monster < 50:
-       hero["health"] -= 10
+        if monster['direction'] == 1:
+            if monster["y"] > 20:
+                monster["y"] -= monster["speed"]
+        elif monster['direction'] == 2:
+            if monster["y"] < screen["height"] - 200:
+                monster["y"] += monster["speed"]
+        elif monster['direction'] == 3:
+            if monster["x"] > 20:
+                monster["x"] -= monster["speed"]
+        elif monster['direction'] == 4:
+            if monster["x"] < screen["width"] - 200:
+                monster["x"] += monster["speed"]
+        if health_boost['direction'] == 1:
+            if health_boost["y"] > 20:
+                health_boost["y"] -= health_boost["speed"]
+        elif health_boost['direction'] == 2:
+            if health_boost["y"] < screen["height"] - 200:
+                health_boost["y"] += health_boost["speed"]
+        elif health_boost['direction'] == 3:
+            if health_boost["x"] > 20:
+                health_boost["x"] -= health_boost["speed"]
+        elif health_boost['direction'] == 4:
+            if health_boost["x"] < screen["width"] - 200:
+                health_boost["x"] += health_boost["speed"]
+    
+    if distance_from_health < 50:
+        hero['health'] += 30
+        heal_sound.play()
+        health_boost['x'] = 550
+        health_boost['y'] = 500
+        health_boost['speed'] = 0
+    
+    if distance_from_monster < 75:
+        rand_x = randint(0, screen["width"]-50)
+        rand_y = randint(0, screen["height"]-100)
+        lose_sound.play()
+        hero["x"] = rand_x
+        hero["y"] = rand_y
+        hero["health"] -= 10
+       
        
     # random_motion(goblin["x"], goblin["y"])
     # RENDER!
@@ -165,21 +225,21 @@ while game_on:
     pygame_screen.blit(background_image, [0, 0])
 
     # draw the hero's wins on the screen'
-    win_font = pygame.font.Font(None, 25)
-    wins_text = win_font.render("Wins: %d " % (hero["wins"]), True, (0,0,0))
-    pygame_screen.blit(wins_text, [40, 40])
+    kill_font = pygame.font.Font(None, 40)
+    kill_text = kill_font.render("Kills: %d " % (hero["kills"]), True, (241,43,36))
+    pygame_screen.blit(kill_text, [40, 40])
 
-    health_font = pygame.font.Font(None, 25)
-    health_text = health_font.render("Health: %d " % (hero["health"]), True, (0,0,0))
-    pygame_screen.blit(health_text, [400, 40])
-    # dare the hero
+    health_font = pygame.font.Font(None, 40)
+    health_text = health_font.render("Health: %d " % (hero["health"]), True, (44,136,145))
+    pygame_screen.blit(health_text, [340, 40])
+    # draw the hero
     pygame_screen.blit(hero_image_scaled, [hero["x"], hero["y"]])
     pygame_screen.blit(goblin_image_scaled, [goblin["x"], goblin["y"]])
     pygame_screen.blit(monster_image, [monster['x'], monster['y']])
+    pygame_screen.blit(health_boost_image, [health_boost['x'], health_boost['y']])
+
     
     # 7. clear the screen for next time (flip the screen) - the image gets drawn in every loop
     pygame.display.flip()
-    if loop_count % 50 == 0:
-            goblin['direction'] = randint(1,4)
-    loop_count += 1
+    
 
