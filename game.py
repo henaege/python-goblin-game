@@ -90,7 +90,7 @@ loop_count = 0
 game_on = True
 game_paused = False
 hero_won = False
-level = 10
+level = 1
 while game_on:
     # main game loop will run as long as game_on is true
     # EVENTS!
@@ -303,7 +303,7 @@ while game_on:
     health_text = health_font.render("Health: %d " % (hero["health"]), True, (44,136,145))
     pygame_screen.blit(health_text, [340, 10])
     win_font = pygame.font.Font(None, 65)
-    win_font2 = pygame.font.Font(None, 40)
+    win_font2 = pygame.font.Font(None, 50)
     restart_font = pygame.font.Font(None, 40)
     restart_text = restart_font.render("Press Spacebar to Continue...", True, (71, 144, 32))
     pause_font1 = pygame.font.Font(None, 80)
@@ -323,13 +323,13 @@ while game_on:
     pygame_screen.blit(monster_image, [monster['x'], monster['y']])
     pygame_screen.blit(health_boost_image, [health_boost['x'], health_boost['y']])
 
-    if hero['kills'] == 3 and not level == 10:
-        hero_won = not hero_won
+    if hero['kills'] == 10 and not level == 10:
+        hero_won = True
         # pygame.mixer.music.pause()
         # win_sound.play()
         pygame_screen.blit(background_image, [0, 0])
         win_text = win_font.render("You Win!!", True, (71, 144, 32))
-        pygame_screen.blit(win_text, [120, 180])
+        pygame_screen.blit(win_text, [150, 180])
         pygame_screen.blit(restart_text, [60, 250])
         if event.key == 32:
             hero_won = False
@@ -344,19 +344,19 @@ while game_on:
             pygame_screen.blit(goblin_image_scaled, [goblin["x"], goblin["y"]])
             pygame_screen.blit(monster_image, [monster['x'], monster['y']])
             pygame_screen.blit(health_boost_image, [health_boost['x'], health_boost['y']])
-    elif hero['kills'] == 3 and level == 10:
-        hero_won = not hero_won
+    elif hero['kills'] == 10 and level == 10:
+        hero_won = True
         game_win_text = win_font.render("CONGRATULATIONS!", True, (71, 144, 32))
         game_win_text2 = win_font2.render("You have saved the Realm!", True, (71, 144, 32))
         game_win_text3 = restart_font.render("Press Spacebar to Quit...", True, (71, 144, 32))
         pygame_screen.blit(background_image, [0, 0])
         pygame_screen.blit(game_win_text, [20, 100])
-        pygame_screen.blit(game_win_text2, [50, 160])
-        pygame_screen.blit(game_win_text3, [30, 220])
+        pygame_screen.blit(game_win_text2, [35, 160])
+        pygame_screen.blit(game_win_text3, [80, 220])
         if event.key == 32:
             game_on = False
     if hero['health'] <= 0:
-        hero_won = not hero_won
+        hero_won = True
         # pygame.mixer.music.pause()
         # win_sound.play()
         pygame_screen.blit(background_image, [0, 0])
