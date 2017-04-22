@@ -47,7 +47,9 @@ monster = {
     'x': 300,
     'y': 50,
     'speed': 10,
-    'direction': 'SE'
+    'direction': 'SE',
+    'damage': 10
+
 }
 
 rand_x = randint(0, screen["width"]-50)
@@ -56,7 +58,8 @@ health_boost = {
     'x': rand_x,
     'y': rand_y,
     'speed': 5,
-    'direction': 'S'
+    'direction': 'S',
+    'amount': 30
 }
 
 directions = ['N','S','E','W','NE','NW','SE','SW']
@@ -87,6 +90,7 @@ loop_count = 0
 game_on = True
 game_paused = False
 hero_won = False
+level = 10
 while game_on:
     # main game loop will run as long as game_on is true
     # EVENTS!
@@ -135,7 +139,7 @@ while game_on:
         goblin_dir_index = randint(0, len(directions)-1)
         goblin['direction'] = directions[goblin_dir_index]
     
-    if loop_count % 30 == 0:
+    if loop_count % 20 == 0:
         monster_dir_index = randint(0, len(directions)-1)
         monster['direction'] = directions[monster_dir_index]
     
@@ -211,7 +215,7 @@ while game_on:
             lose_sound.play()
             hero["x"] = rand_x
             hero["y"] = rand_y
-            hero["health"] -= 10
+            hero["health"] -= monster['damage']
         elif (monster['direction'] == 'N'):
             if monster['y'] > 20:
                 monster['y'] -= monster['speed']
@@ -242,7 +246,7 @@ while game_on:
                 monster['x'] -= monster['speed']
         
         if distance_from_health < 50:
-            hero['health'] += 30
+            hero['health'] += health_boost['amount']
             heal_sound.play()
             health_boost['x'] = 550
             health_boost['y'] = 500
@@ -289,13 +293,17 @@ while game_on:
     # draw the hero's wins on the screen'
     kill_font = pygame.font.Font(None, 40)
     kill_text = kill_font.render("Kills: %d " % (hero["kills"]), True, (241,43,36))
-    pygame_screen.blit(kill_text, [40, 40])
+    pygame_screen.blit(kill_text, [40, 10])
+    level_font = pygame.font.Font(None, 40)
+    level_text = level_font.render('Level: %d' % (level), True, (1, 155, 225))
+    pygame_screen.blit(level_text, [190, 10])
 
     
     health_font = pygame.font.Font(None, 40)
     health_text = health_font.render("Health: %d " % (hero["health"]), True, (44,136,145))
-    pygame_screen.blit(health_text, [340, 40])
-    win_font = pygame.font.Font(None, 80)
+    pygame_screen.blit(health_text, [340, 10])
+    win_font = pygame.font.Font(None, 65)
+    win_font2 = pygame.font.Font(None, 40)
     restart_font = pygame.font.Font(None, 40)
     restart_text = restart_font.render("Press Spacebar to Continue...", True, (71, 144, 32))
     pause_font1 = pygame.font.Font(None, 80)
@@ -315,7 +323,7 @@ while game_on:
     pygame_screen.blit(monster_image, [monster['x'], monster['y']])
     pygame_screen.blit(health_boost_image, [health_boost['x'], health_boost['y']])
 
-    if hero['kills'] == 10:
+    if hero['kills'] == 3 and not level == 10:
         hero_won = not hero_won
         # pygame.mixer.music.pause()
         # win_sound.play()
@@ -326,16 +334,28 @@ while game_on:
         if event.key == 32:
             hero_won = False
             hero['kills'] = 0
-            hero['health'] = 60
+            level += 1
             # pygame.mixer.music.play()
             pygame_screen.blit(background_image, [0, 0])
             pygame_screen.blit(kill_text, [40, 40])
             pygame_screen.blit(health_text, [340, 40])
+            pygame_screen.blit(level_text, [190, 10])
             pygame_screen.blit(hero_image_scaled, [hero["x"], hero["y"]])
             pygame_screen.blit(goblin_image_scaled, [goblin["x"], goblin["y"]])
             pygame_screen.blit(monster_image, [monster['x'], monster['y']])
             pygame_screen.blit(health_boost_image, [health_boost['x'], health_boost['y']])
-    elif hero['health'] == 0:
+    elif hero['kills'] == 3 and level == 10:
+        hero_won = not hero_won
+        game_win_text = win_font.render("CONGRATULATIONS!", True, (71, 144, 32))
+        game_win_text2 = win_font2.render("You have saved the Realm!", True, (71, 144, 32))
+        game_win_text3 = restart_font.render("Press Spacebar to Quit...", True, (71, 144, 32))
+        pygame_screen.blit(background_image, [0, 0])
+        pygame_screen.blit(game_win_text, [20, 100])
+        pygame_screen.blit(game_win_text2, [50, 160])
+        pygame_screen.blit(game_win_text3, [30, 220])
+        if event.key == 32:
+            game_on = False
+    if hero['health'] <= 0:
         hero_won = not hero_won
         # pygame.mixer.music.pause()
         # win_sound.play()
@@ -355,6 +375,30 @@ while game_on:
             pygame_screen.blit(goblin_image_scaled, [goblin["x"], goblin["y"]])
             pygame_screen.blit(monster_image, [monster['x'], monster['y']])
             pygame_screen.blit(health_boost_image, [health_boost['x'], health_boost['y']])
+    
+    if level == 2:
+        goblin['speed'] = 4
+    if level == 3:
+        monster['speed'] = 12
+    if level == 4:
+        goblin['speed'] = 5
+    if level == 5:
+        monster['damage'] = 15
+    if level == 6:
+        hero['speed'] = 6
+        monster['damage'] = 20
+    if level == 7:
+        health_boost['amount'] = 45
+    if level == 8:
+        goblin['speed'] = 6
+        health_boost['amount'] = 50
+    if level == 9:
+        monster['speed'] = 14
+    if level == 10:
+        goblin['speed'] = 8
+        hero['speed'] = 7
+        monster['damage'] = 25
+
 
     # 7. clear the screen for next time (flip the screen) - the image gets drawn in every loop
     pygame.display.flip()
