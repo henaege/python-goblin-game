@@ -82,7 +82,8 @@ pygame.mixer.music.play(-1)
 kill_sound = pygame.mixer.Sound('./sounds/orc_die.ogg')
 lose_sound = pygame.mixer.Sound('./sounds/hits/6.ogg')
 heal_sound = pygame.mixer.Sound('./sounds/heal.wav')
-win_sound = pygame.mixer.Sound('./sounds/victory.wav')
+win_sound = pygame.mixer.Sound('./sounds/extralife.wav')
+death_sound = pygame.mixer.Sound('./sounds/0477.ogg')
 # ///////////////////// MAIN GAME LOOP ///////////////////
 
 # 4. create game loop
@@ -91,6 +92,7 @@ game_on = True
 game_paused = False
 hero_won = False
 level = 1
+
 while game_on:
     # main game loop will run as long as game_on is true
     # EVENTS!
@@ -322,14 +324,13 @@ while game_on:
     pygame_screen.blit(goblin_image_scaled, [goblin["x"], goblin["y"]])
     pygame_screen.blit(monster_image, [monster['x'], monster['y']])
     pygame_screen.blit(health_boost_image, [health_boost['x'], health_boost['y']])
-
     if hero['kills'] == 10 and not level == 10:
         hero_won = True
         # pygame.mixer.music.pause()
         # win_sound.play()
         pygame_screen.blit(background_image, [0, 0])
-        win_text = win_font.render("You Win!!", True, (71, 144, 32))
-        pygame_screen.blit(win_text, [150, 180])
+        win_text = win_font.render("Level Complete!!", True, (71, 144, 32))
+        pygame_screen.blit(win_text, [80, 180])
         pygame_screen.blit(restart_text, [60, 250])
         if event.key == 32:
             hero_won = False
@@ -345,7 +346,11 @@ while game_on:
             pygame_screen.blit(monster_image, [monster['x'], monster['y']])
             pygame_screen.blit(health_boost_image, [health_boost['x'], health_boost['y']])
     elif hero['kills'] == 10 and level == 10:
+        play_sound = 0
         hero_won = True
+        pygame.mixer.music.stop()
+        win_sound.set_volume(0.6)
+        win_sound.play(loops=0)
         game_win_text = win_font.render("CONGRATULATIONS!", True, (71, 144, 32))
         game_win_text2 = win_font2.render("You have saved the Realm!", True, (71, 144, 32))
         game_win_text3 = restart_font.render("Press Spacebar to Quit...", True, (71, 144, 32))
@@ -358,7 +363,9 @@ while game_on:
     if hero['health'] <= 0:
         hero_won = True
         # pygame.mixer.music.pause()
-        # win_sound.play()
+        death_sound.play(maxtime=1000)
+        death_sound.get_volume()
+        # death_sound.stop()
         pygame_screen.blit(background_image, [0, 0])
         lose_text = lose_font.render("You Lose!", True, (200, 30, 30))
         pygame_screen.blit(lose_text, [120, 180])
@@ -375,7 +382,6 @@ while game_on:
             pygame_screen.blit(goblin_image_scaled, [goblin["x"], goblin["y"]])
             pygame_screen.blit(monster_image, [monster['x'], monster['y']])
             pygame_screen.blit(health_boost_image, [health_boost['x'], health_boost['y']])
-    
     if level == 2:
         goblin['speed'] = 4
     if level == 3:
