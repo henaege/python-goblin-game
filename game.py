@@ -91,7 +91,7 @@ loop_count = 0
 game_on = True
 game_paused = False
 hero_won = False
-level = 1
+level = 10
 
 while game_on:
     # main game loop will run as long as game_on is true
@@ -182,6 +182,9 @@ while game_on:
             
             hero["kills"] += 1
             kill_sound.play()
+            if hero['kills'] == 10 and level == 10:
+                win_sound.set_volume(0.6)
+                win_sound.play()
         elif (goblin['direction'] == 'N'):
             if goblin['y'] > 20:
                 goblin['y'] -= goblin['speed']
@@ -218,6 +221,8 @@ while game_on:
             hero["x"] = rand_x
             hero["y"] = rand_y
             hero["health"] -= monster['damage']
+            if hero['health'] <= 0:
+                death_sound.play()
         elif (monster['direction'] == 'N'):
             if monster['y'] > 20:
                 monster['y'] -= monster['speed']
@@ -317,7 +322,7 @@ while game_on:
     if game_paused:
         pygame_screen.blit(pause_text1, [60, 180])
         pygame_screen.blit(pause_text2, [60, 250])
-
+    play_death_sound = False
 
     # draw the hero
     pygame_screen.blit(hero_image_scaled, [hero["x"], hero["y"]])
@@ -349,8 +354,7 @@ while game_on:
         play_sound = 0
         hero_won = True
         pygame.mixer.music.stop()
-        win_sound.set_volume(0.6)
-        win_sound.play(loops=0)
+        
         game_win_text = win_font.render("CONGRATULATIONS!", True, (71, 144, 32))
         game_win_text2 = win_font2.render("You have saved the Realm!", True, (71, 144, 32))
         game_win_text3 = restart_font.render("Press Spacebar to Quit...", True, (71, 144, 32))
@@ -363,8 +367,8 @@ while game_on:
     if hero['health'] <= 0:
         hero_won = True
         # pygame.mixer.music.pause()
-        death_sound.play(maxtime=1000)
-        death_sound.get_volume()
+        
+        
         # death_sound.stop()
         pygame_screen.blit(background_image, [0, 0])
         lose_text = lose_font.render("You Lose!", True, (200, 30, 30))
