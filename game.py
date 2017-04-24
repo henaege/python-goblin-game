@@ -307,7 +307,7 @@ while game_on:
     win_font = pygame.font.Font(None, 65)
     win_font2 = pygame.font.Font(None, 50)
     restart_font = pygame.font.Font(None, 40)
-    restart_text = restart_font.render("Press Spacebar to Continue...", True, (71, 144, 32))
+    restart_text = restart_font.render("Press Enter to Continue...", True, (71, 144, 32))
     pause_font1 = pygame.font.Font(None, 80)
     pause_font2 = pygame.font.Font(None, 40)
     pause_text1 = pause_font1.render("Game Paused", True, (71, 144, 32))
@@ -331,8 +331,8 @@ while game_on:
         pygame_screen.blit(background_image, [0, 0])
         win_text = win_font.render("Level Complete!!", True, (71, 144, 32))
         pygame_screen.blit(win_text, [80, 180])
-        pygame_screen.blit(restart_text, [60, 250])
-        if event.key == 32:
+        pygame_screen.blit(restart_text, [85, 250])
+        if event.key == pygame.K_RETURN:
             hero_won = False
             hero['kills'] = 0
             level += 1
@@ -369,8 +369,8 @@ while game_on:
         pygame_screen.blit(background_image, [0, 0])
         lose_text = lose_font.render("You Lose!", True, (200, 30, 30))
         pygame_screen.blit(lose_text, [120, 180])
-        pygame_screen.blit(restart_text, [60, 250])
-        if event.key == 32:
+        pygame_screen.blit(restart_text, [85, 250])
+        if event.key == pygame.K_RETURN:
             hero_won = False
             hero['kills'] = 0
             hero['health'] = 60
