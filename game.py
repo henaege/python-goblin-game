@@ -124,7 +124,7 @@ while game_on:
                 keys_down["right"] = True
             elif event.key == 32:
 				# user pushed space!
-				game_paused = not game_paused
+                game_paused = not game_paused
         elif event.type == pygame.KEYUP:
             print "The user let go of the key"
             if event.key == keys["up"]:
@@ -181,10 +181,11 @@ while game_on:
             goblin["y"] = rand_y
             
             hero["kills"] += 1
+            kill_sound.set_volume(0.6)
             kill_sound.play()
             if hero['kills'] == 10 and level == 10:
-                win_sound.set_volume(0.6)
-                win_sound.play()
+                # win_sound.set_volume(0.8)
+                win_sound.play(loops=0)
         elif (goblin['direction'] == 'N'):
             if goblin['y'] > 20:
                 goblin['y'] -= goblin['speed']
@@ -322,7 +323,7 @@ while game_on:
     if game_paused:
         pygame_screen.blit(pause_text1, [60, 180])
         pygame_screen.blit(pause_text2, [60, 250])
-    play_death_sound = False
+
 
     # draw the hero
     pygame_screen.blit(hero_image_scaled, [hero["x"], hero["y"]])
@@ -367,8 +368,6 @@ while game_on:
     if hero['health'] <= 0:
         hero_won = True
         # pygame.mixer.music.pause()
-        
-        
         # death_sound.stop()
         pygame_screen.blit(background_image, [0, 0])
         lose_text = lose_font.render("You Lose!", True, (200, 30, 30))
