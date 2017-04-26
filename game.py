@@ -91,7 +91,7 @@ loop_count = 0
 game_on = True
 game_paused = False
 hero_won = False
-level = 10
+level = 1
 
 while game_on:
     # main game loop will run as long as game_on is true
