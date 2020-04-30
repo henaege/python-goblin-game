@@ -126,7 +126,7 @@ while game_on:
 				# user pushed space!
                 game_paused = not game_paused
         elif event.type == pygame.KEYUP:
-            print "The user let go of the key"
+            # print "The user let go of the key"
             if event.key == keys["up"]:
                 keys_down["up"] = False
             if event.key == keys["down"]:
